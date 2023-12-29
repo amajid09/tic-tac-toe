@@ -1,151 +1,160 @@
-// /*
-// ** The Gameboard represents the state of the board
-// ** Each equare holds a Cell (defined later)
-// ** and we expose a dropToken method to be able to add Cells to squares
-// */
+let board = [
+    [ 1, 2, 3 ],
+    [ 4, 5, 6 ],
+    [ 7, 8, 9 ],
+]
+let turn = "player 1"
+let taken = "x";
+function run(input){
+        if( !istaken( input ) ){
+            turn = turn == "player 1" ? "player 2" : "player 1" 
+            taken = taken == "x" ? "o" : "x"
+            updateBoard(input)
+            renderBoard(input, taken)
+         
+    }
+}
+function renderBoard(input, taken) {
+    let items = document.querySelectorAll(".item")
+    items.forEach(i => {
+        if (i.classList[1] == input){
+            i.textContent = taken
+        }
+})
+}
+function updateBoard(input){
+    let number = parseInt(input);
+    let row = getRow(number)
+    let col = getCol(number, row) 
+    board[row][col] = taken
+    console.log("updated...")
+}
+function getCol(number, row){
+    return (number-1) - 3*row;
+}
+function getRow(number) {
+    return Math.trunc((number-1) / 3);
+}
+function istaken( input ) {
+    let number = parseInt(input)
+    let row = getRow(number) 
+    let col = getCol(number, row)
+    return board[row][col] == taken;
+}
+async function startGame(){
+    //listen for click events
+    let item = document.querySelectorAll(".item")
+    let input; 
+    item.forEach(i => {
+        i.addEventListener("click", function(e) {
+            input = i.classList[1]
+            if(isWinning()) {
+                document.querySelector("h1").textContent = taken.toUpperCase() + " WON!"
+                return;
+            } 
+            run(input)  
+            console.log(board)       
+        })
+    })
+}
+function isWinning(){
+    return right() || top() || middle() || center() || left() || bottom() || diagonal()
+}
+function top(){
+    let count = 0;
+    for(let i = 0;i < 3; i++) {
+        if(board[0][i] == taken){
+            count++;
+        }
+    }
+    return count == 3;
+}
 
-// function Gameboard() {
-//     const rows = 6;
-//     const columns = 7;
-//     const board = [];
-  
-//     // Create a 2d array that will represent the state of the game board
-//     // For this 2d array, row 0 will represent the top row and
-//     // column 0 will represent the left-most column.
-//     // This nested-loop technique is a simple and common way to create a 2d array.
-//     for (let i = 0; i < rows; i++) {
-//       board[i] = [];
-//       for (let j = 0; j < columns; j++) {
-//         board[i].push(Cell());
-//       }
-//     }
-  
-//     // This will be the method of getting the entire board that our
-//     // UI will eventually need to render it.
-//     const getBoard = () => board;
-  
-//     // In order to drop a token, we need to find what the lowest point of the
-//     // selected column is, *then* change that cell's value to the player number
-//     const dropToken = (column, player) => {
-//       // Our board's outermost array represents the row,
-//       // so we need to loop through the rows, starting at row 0,
-//       // find all the rows that don't have a token, then take the
-//       // last one, which will represent the bottom-most empty cell
-//       const availableCells = board.filter((row) => row[column].getValue() === 0).map(row => row[column]);
-  
-//       // If no cells make it through the filter, 
-//       // the move is invalid. Stop execution.
-//       if (!availableCells.length) return;
-  
-//       // Otherwise, I have a valid cell, the last one in the filtered array
-//       const lowestRow = availableCells.length - 1;
-//       board[lowestRow][column].addToken(player);
-//     };
-  
-//     // This method will be used to print our board to the console.
-//     // It is helpful to see what the board looks like after each turn as we play,
-//     // but we won't need it after we build our UI
-//     const printBoard = () => {
-//       const boardWithCellValues = board.map((row) => row.map((cell) => cell.getValue()))
-//       console.log(boardWithCellValues);
-//     };
-  
-//     // Here, we provide an interface for the rest of our
-//     // application to interact with the board
-//     return { getBoard, dropToken, printBoard };
-//   }
-  
-//   /*
-//   ** A Cell represents one "square" on the board and can have one of
-//   ** 0: no token is in the square,
-//   ** 1: Player One's token,
-//   ** 2: Player 2's token
-//   */
-  
-//   function Cell() {
-//     let value = 0;
-  
-//     // Accept a player's token to change the value of the cell
-//     const addToken = (player) => {
-//       value = player;
-//     };
-  
-//     // How we will retrieve the current value of this cell through closure
-//     const getValue = () => value;
-  
-//     return {
-//       addToken,
-//       getValue
-//     };
-//   }
-  
-//   /* 
-//   ** The GameController will be responsible for controlling the 
-//   ** flow and state of the game's turns, as well as whether
-//   ** anybody has won the game
-//   */
-//   function GameController(
-//     playerOneName = "Player One",
-//     playerTwoName = "Player Two"
-//   ) {
-//     const board = Gameboard();
-  
-//     const players = [
-//       {
-//         name: playerOneName,
-//         token: 1
-//       },
-//       {
-//         name: playerTwoName,
-//         token: 2
-//       }
-//     ];
-  
-//     let activePlayer = players[0];
-  
-//     const switchPlayerTurn = () => {
-//       activePlayer = activePlayer === players[0] ? players[1] : players[0];
-//     };
-//     const getActivePlayer = () => activePlayer;
-  
-//     const printNewRound = () => {
-//       board.printBoard();
-//       console.log(`${getActivePlayer().name}'s turn.`);
-//     };
-  
-//     const playRound = (column) => {
-//       // Drop a token for the current player
-//       console.log(
-//         `Dropping ${getActivePlayer().name}'s token into column ${column}...`
-//       );
-//       board.dropToken(column, getActivePlayer().token);
-  
-//       /*  This is where we would check for a winner and handle that logic,
-//           such as a win message. */
-  
-//       // Switch player turn
-//       switchPlayerTurn();
-//       printNewRound();
-//     };
-  
-//     // Initial play game message
-//     printNewRound();
-  
-//     // For the console version, we will only use playRound, but we will need
-//     // getActivePlayer for the UI version, so I'm revealing it now
-//     return {
-//       playRound,
-//       getActivePlayer
-//     };
-//   }
-  
-//   const game = GameController();
+function center(){
+    let count = 0;
+    for(let i = 0;i < 3; i++) {
+        if(board[1][i] == taken) {
+            count ++;
+        }
+    }
+    return count == 3;
+}
+
+function bottom() {
+    let count = 0;
+    for(let i = 0;i< 3; i++) {
+        if(board[2][i] == taken) {
+            count++;
+        }
+    }
+    return count == 3;
+}
+function right(){
+    let count = 0; 
+    for (let i = 0; i < 3; i++ ){
+        if(board[i][0] == taken) {
+            count ++;
+        }
+    }
+    return count == 3;
+}
+
+function middle() {
+    let count = 0;
+    for (let i = 0; i < 3; i++ ){
+        if(board[i][1] == taken) {
+            count++;
+        }
+    }
+    return count == 3;
+}
+function left(){
+    let count = 0;
+    for (let i = 0; i < 3; i++ ){
+        if(board[i][2] == taken) {
+            count++;
+        }
+    }
+    return count == 3;
+}
+function diagonal() {
+    return ( board[0][0] == taken && board[1][1] == taken && board[2][2] == taken ) ||
+    ( board[2][0] == taken  && board[1][1] == taken && board[0][2] == taken )
+}
+function restartGame(){
+    for(let i = 0; i< 3; i++) {
+        for (let j = 0; j < 3; j++){
+            board[i][j] = (i*3) + j+1
+        }
+    }
+    let items = document.querySelectorAll(".item");
+    items.forEach(i=> {
+        i.textContent = ""
+    })
+    document.querySelector("h1").textContent = ""
+}
+startGame()
+document.querySelector("button").addEventListener("click", function(e){
+    restartGame();
+    startGame()
+})
 
 
-import moment from 'moment';
+function removeBorders(){
+    let items = document.querySelectorAll(".item")
+    items.forEach(i=> {
+        let lb = ["4","6"];
+        let bt = ["2", "8"]
+       if( lb.indexOf(i.classList[1]) > -1 ) {
+            i.style = "border-left:none;border-right:none"
+       } 
+       else if(bt.indexOf(i.classList[1]) > -1 ) {
+            i.style = "border-bottom:none;border-top:none"
+       }
+       else if(i.classList[1] != 5){
+            i.style = "border:none;"
+       }
 
-
-console.log("Hello from JavaScript!")
-console.log(moment().startOf('day').fromNow());
-
-
+    })
+}
+removeBorders()
