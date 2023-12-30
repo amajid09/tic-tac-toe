@@ -45,6 +45,7 @@ const GameBoard = (sign) => {
         }
         return count == 3;
     }
+
     const right = () => {
         let count = 0; 
         for (let i = 0; i < 3; i++ ){
@@ -64,6 +65,7 @@ const GameBoard = (sign) => {
         }
         return count == 3;
     }
+
     const left = () => {
         let count = 0;
         for (let i = 0; i < 3; i++ ){
@@ -73,6 +75,7 @@ const GameBoard = (sign) => {
         }
         return count == 3;
     }
+
     const diagonal = () => {
         return ( board[0][0] == _sign && board[1][1] == _sign && board[2][2] == _sign ) ||
         ( board[2][0] == _sign  && board[1][1] == _sign && board[0][2] == _sign );
@@ -80,7 +83,9 @@ const GameBoard = (sign) => {
 
 
     const getBoard = () => board;
+
     const setBoard =(i, j, value) => board[i][j] = value;
+
     const resetBoard = () => {
         for(let i = 0; i< 3; i++) {
             for (let j = 0; j < 3; j++){
@@ -99,16 +104,22 @@ const GameBoard = (sign) => {
 
 
 const Game = (player, input) => {
+
     let _player = player;
     let _input = input; 
     let board = GameBoard(_player.getSign());
+
     const setPlayer = () => _player.getSign() == "x" ? 
     _player.setSign("o") : _player.setSign("x");
-;
+
     const setInput = (input) => _input = input;
+
     const  getCol = (number, row) => (number-1) - 3*row;
+
     const getRow = (number) =>  Math.trunc((number-1) / 3);
+ 
     const getPlayer = () => player; 
+  
     const updateBoard = () => {
         let number = parseInt(_input);
         let row = getRow(number);
@@ -126,6 +137,7 @@ const Game = (player, input) => {
             }
         })
     }
+ 
     const isTaken = () => {
         let number = parseInt(_input);
         let row = getRow(number);
@@ -134,7 +146,9 @@ const Game = (player, input) => {
         console.log(board.getBoard()[row][col])
         return ["x", "o"].indexOf(board.getBoard()[row][col]) > -1;
     }
+  
     const isWinning = () => board.isWinning()
+   
     const isDraw = () => {
         let count = 0; 
         for(let i = 0; i < 3; i++) {
@@ -148,16 +162,19 @@ const Game = (player, input) => {
     };
 
     const resetBoard = () => board.resetBoard();
+    
     return {updateBoard,resetBoard, isDraw, renderBoard, setPlayer, setInput, isTaken, isWinning};
 }
+
 const Main = () => {
     const player = Player("x");
     const game =  Game(player, -1);
     const run = () => {
-            game.updateBoard();
-            game.renderBoard();
+        game.updateBoard();
+        game.renderBoard();
 
     }
+    
     const startGame = () => {
         let item = document.querySelectorAll(".item");
         let input; 
@@ -181,29 +198,32 @@ const Main = () => {
             })
         })
     }
+    
     const restartGame = () => {
         document.querySelector("button").addEventListener("click", function(e){
             game.resetBoard();
             startGame()
         })
     }
+    
+    
     const removeBoarders = () => {
         let items = document.querySelectorAll(".item")
         items.forEach(i=> {
             let lb = ["4","6"];
             let bt = ["2", "8"]
         if( lb.indexOf(i.classList[1]) > -1 ) {
-                i.style = "border-left:none;border-right:none"
+            i.style = "border-left:none;border-right:none"
         } 
         else if(bt.indexOf(i.classList[1]) > -1 ) {
-                i.style = "border-bottom:none;border-top:none"
+            i.style = "border-bottom:none;border-top:none"
         }
         else if(i.classList[1] != 5){
-                i.style = "border:none;"
+            i.style = "border:none;"
         }
-
         })
     }
+    
     return {removeBoarders,startGame, restartGame}
 };
 
